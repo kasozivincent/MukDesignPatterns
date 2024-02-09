@@ -4,7 +4,11 @@ namespace DesignPatterns
 {
     public class BankProgram
     {
-       public static 
+       public static void Main()
+       {
+           var bankClient = new BankClient();
+           bankClient.Run();
+       }
     }
     
 }
