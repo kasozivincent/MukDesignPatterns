@@ -7,11 +7,24 @@ namespace DesignPatterns
         private IDictionary<Guid, Account> accounts = new Dictionary<Guid, Account>();
         private double rate = 0.01;
         
-        public string CreateAccount(decimal intialDeposit){
+        public string CreateAccount(decimal intialDeposit, Category category){
             var accountNumber = Guid.NewGuid();
-            accounts.Add(accountNumber, Account.Create(intialDeposit));
+            accounts.Add(accountNumber, Account.Create(intialDeposit, category));
             return $"Your new account number is {accountNumber}";
         }
+
+        public void ChangeAccountState(Guid accountNumber, State state)
+        {
+            var account = accounts[accountNumber];
+            account.State = state;
+        }
+
+        public void ChangeAccountCategory(Guid accountNumber, Category category)
+        {
+            var account = accounts[accountNumber];
+            account.Category = category;
+        }
+
 
         public decimal GetBalance(Guid accountNumber){
             var account = accounts[accountNumber];
@@ -41,7 +54,8 @@ namespace DesignPatterns
             builder.AppendLine($"The bank has {accountNumbers.Count} accounts");
             foreach(var accountNumber in accountNumbers)
             {
-                builder.AppendLine(accounts[accountNumber].ToString());
+                var account = accounts[accountNumber];
+                builder.AppendLine(account.ToString());
             }
             return builder.ToString();
         }
@@ -67,7 +81,6 @@ namespace DesignPatterns
             
            senderAccount.Balance -=  amount;
            recipientAccount.Balance += amount;
-        
         }
     }
 }
