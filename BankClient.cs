@@ -25,8 +25,10 @@ namespace DesignPatterns
                 menu.AppendLine("5 --> Display Accounts");
                 menu.AppendLine("6 --> Compute Interest");
                 menu.AppendLine("7 --> Transfer Money");
+                menu.AppendLine("8 --> Change account state");
+                menu.AppendLine("9 --> Change account category");
                 WriteLine(menu.ToString());
-                var input = int.Parse(ReadLine());
+                var input = int.Parse(ReadLine()!);
                 ProcessCommand(input);
                 Run();
             }
@@ -43,7 +45,31 @@ namespace DesignPatterns
             else if(command == 5) DisplayAccounts();
             else if(command == 6) AddInterest();
             else if(command == 7) TransferMoney();
+            else if (command == 8) ChangeAccountState();
+            else if (command == 9) ChangeAccountCategory();
             else WriteLine("illegal command");
+        }
+
+        private void ChangeAccountCategory()
+        {
+            WriteLine("Enter the account number");
+            var accountNumber = Guid.Parse(ReadLine()!);
+
+            WriteLine("Enter the account category");
+            var result = ReadLine();
+            var category = (Category)Enum.Parse(typeof(Category), result!);
+            bank.ChangeAccountCategory(accountNumber, category);
+        }
+
+        private void ChangeAccountState()
+        {
+            WriteLine("Enter the account number");
+            var accountNumber = Guid.Parse(ReadLine());
+
+            WriteLine("Enter the account state");
+            var state = ReadLine();
+            var enumValue = (State)Enum.Parse(typeof(State), state!);
+            bank.ChangeAccountState(accountNumber, enumValue);
         }
 
         private void Quit(){
@@ -52,24 +78,30 @@ namespace DesignPatterns
         }
 
         private void CreateAccount(){
-            var accountNumber = bank.CreateAccount();
+            WriteLine("Enter the initial deposit");
+            var amount = decimal.Parse(ReadLine());
+
+            WriteLine("Enter the account category");
+            var input = ReadLine();
+            var category = (Category)Enum.Parse(typeof(Category), input!);
+            var accountNumber = bank.CreateAccount(amount, category);
             WriteLine($"Your new account number is {accountNumber}");
         }
 
 
         private void SelectAccount(){
             WriteLine("Enter account number: ");
-            var accountNumber = int.Parse(ReadLine());
+            var accountNumber = Guid.Parse(ReadLine());
             var balance = bank.GetBalance(accountNumber);
             WriteLine($"The balance of account {accountNumber}  is  {balance}");
         }
 
         private void DepositMoney(){
             WriteLine("Enter account number: ");
-            int accountNumber = int.Parse(ReadLine());
+            var accountNumber = Guid.Parse(ReadLine());
 
             WriteLine("Enter amount: ");
-            int amount = int.Parse(ReadLine());
+            var amount = decimal.Parse(ReadLine());
 
             var message = bank.DepositMoney(accountNumber, amount);
             WriteLine(message);
@@ -77,26 +109,34 @@ namespace DesignPatterns
 
         private void ProcessLoan(){
             WriteLine("Enter account number: ");
-            int accountNumber = int.Parse(ReadLine());
+            var accountNumber = Guid.Parse(ReadLine());
 
             WriteLine("Enter amount: ");
-            int loanAmount = int.Parse(ReadLine());
+            var loanAmount = decimal.Parse(ReadLine());
 
-            if(bank.IsElligibleForLoan(accountNumber, loanAmount))
-                WriteLine("Your loan is approved");
-            else
-                WriteLine("Your loan is denied");
+            switch (bank.IsElligibleForLoan(accountNumber, loanAmount))
+            {
+                case Status.Approved: {
+                   WriteLine("Your loan is approved");
+                   break;
+                }
+                case Status.Rejected: {
+                    WriteLine("Your loan is denied");
+                    break;
+                }
+                default: break;
+            }
         }
 
          private void TransferMoney(){
            WriteLine("Enter sender account number: ");
-           var senderAccountNumber = int.Parse(ReadLine());
+           var senderAccountNumber = Guid.Parse(ReadLine());
 
            WriteLine("Enter recipient's account number: ");
-           var recipientAccountNumber = int.Parse(ReadLine());
+           var recipientAccountNumber = Guid.Parse(ReadLine());
 
            WriteLine("Enter amount: ");
-           var amount = int.Parse(ReadLine());
+           var amount = decimal.Parse(ReadLine());
 
            bank.TransferMoney(senderAccountNumber, recipientAccountNumber, amount);
         
@@ -106,7 +146,7 @@ namespace DesignPatterns
             bank.AddInterest();
         }
 
-        public void DisplayAccounts()
+        private void DisplayAccounts()
         {
             WriteLine(bank.DisplayAccounts());
         }
