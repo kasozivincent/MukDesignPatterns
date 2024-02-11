@@ -17,7 +17,7 @@ namespace DesignPatterns
             return $"SavingsAccount: Account Number: {AccountNumber} -- Balance: {Balance} -- Creation Date: {CreatedOn} -- State: {State}";
         }
 
-        public void AddInterest(double rate) {
+        public override void AddInterest(double rate) {
             Balance += Balance * (decimal)rate;
         }
     }

@@ -76,10 +76,7 @@ namespace DesignPatterns
             foreach(var accountNumber in accountNumbers)
             {
                 var account = accounts[accountNumber];
-                if (account is SavingsAccount) 
-                {
-                    ((SavingsAccount)account).AddInterest(rate);
-                }
+                    account.AddInterest(rate);
             }
         }
 

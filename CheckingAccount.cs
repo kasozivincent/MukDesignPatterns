@@ -17,5 +17,8 @@ namespace DesignPatterns
             return $"CheckingAccount: Account Number: {AccountNumber} -- Balance: {Balance} -- Creation Date: {CreatedOn} -- State: {State}";
         }
 
+        public override void AddInterest(double rate) {
+        }
+
     }
 }

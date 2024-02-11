@@ -36,5 +36,6 @@ namespace DesignPatterns
 
         public abstract Status IsElligibleForLoan(decimal loanAmount);
 
+        public abstract void AddInterest(double rate);
     }
 }
