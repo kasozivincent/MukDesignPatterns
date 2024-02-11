@@ -6,7 +6,10 @@ namespace DesignPatterns
     {
        public static void Main()
        {
-           var bankClient = new BankClient();
+           var accounts = new Dictionary<Guid, Account>();
+           var rate = 0.1;
+           var bank = new Bank(accounts, rate);
+           var bankClient = new BankClient(bank);
            bankClient.Run();
        }
     }

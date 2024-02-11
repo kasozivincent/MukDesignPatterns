@@ -5,9 +5,13 @@ namespace DesignPatterns
 {
     public class BankClient
     {
+        public BankClient(Bank bank)
+        {
+	        this.bank = bank;
+        }
         private bool done = false;
-        private Bank bank = new Bank();
-
+        private readonly Bank bank;
+        
         public void Run()
         {
             if(done)
@@ -27,6 +31,7 @@ namespace DesignPatterns
                 menu.AppendLine("7 --> Transfer Money");
                 menu.AppendLine("8 --> Change account state");
                 menu.AppendLine("9 --> Change account category");
+                menu.AppendLine("10 --> Withdraw Money");
                 WriteLine(menu.ToString());
                 var input = int.Parse(ReadLine()!);
                 ProcessCommand(input);
@@ -36,7 +41,6 @@ namespace DesignPatterns
 
         private void ProcessCommand(int command)
         {
-            
             if(command == 0) Quit();
             else if(command == 1) CreateAccount();
             else if(command == 2) SelectAccount();
@@ -47,6 +51,7 @@ namespace DesignPatterns
             else if(command == 7) TransferMoney();
             else if (command == 8) ChangeAccountState();
             else if (command == 9) ChangeAccountCategory();
+            else if (command == 10) WithDrawMoney();
             else WriteLine("illegal command");
         }
 
@@ -83,8 +88,11 @@ namespace DesignPatterns
 
             WriteLine("Enter the account category");
             var input = ReadLine();
+
+            WriteLine("Enter the account type");
+            var type = ReadLine();
             var category = (Category)Enum.Parse(typeof(Category), input!);
-            var accountNumber = bank.CreateAccount(amount, category);
+            var accountNumber = bank.CreateAccount(type, amount, category);
             WriteLine($"Your new account number is {accountNumber}");
         }
 
@@ -94,6 +102,16 @@ namespace DesignPatterns
             var accountNumber = Guid.Parse(ReadLine());
             var balance = bank.GetBalance(accountNumber);
             WriteLine($"The balance of account {accountNumber}  is  {balance}");
+        }
+
+        private void WithDrawMoney(){
+            WriteLine("Enter account number: ");
+            var accountNumber = Guid.Parse(ReadLine());
+
+            WriteLine("Enter amount: ");
+            var amount = decimal.Parse(ReadLine());
+
+            bank.WithDrawMoney(accountNumber, amount);
         }
 
         private void DepositMoney(){

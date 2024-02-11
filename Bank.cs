@@ -4,12 +4,22 @@ namespace DesignPatterns
 {
     public class Bank
     {
-        private IDictionary<Guid, Account> accounts = new Dictionary<Guid, Account>();
-        private double rate = 0.01;
+        public Bank(IDictionary<Guid, Account> accounts, double rate)
+        {
+            this.accounts = accounts;
+            this.rate = rate;
+        }
+        private readonly IDictionary<Guid, Account> accounts;
+        private double rate;
         
-        public string CreateAccount(decimal intialDeposit, Category category){
+        public string CreateAccount(string type, decimal intialDeposit, Category category){
             var accountNumber = Guid.NewGuid();
-            accounts.Add(accountNumber, Account.Create(intialDeposit, category));
+            Account bankAccount;
+            if (type == "Savings")
+                bankAccount = new SavingsAccount(intialDeposit, category);
+            else
+                bankAccount = new CheckingAccount(intialDeposit, category);
+            accounts.Add(accountNumber, bankAccount);
             return $"Your new account number is {accountNumber}";
         }
 
@@ -33,23 +43,23 @@ namespace DesignPatterns
 
         public string DepositMoney(Guid accountNumber, decimal amount){
             var account = accounts[accountNumber];
-            var balance = account.Balance;
-            account.Balance = balance + amount;
-            return $"Your new account balance is {balance + amount}";
+            var balance = account.DepositMoney(amount);
+            return $"Your new account balance is {balance}";
+        }
+
+        public void WithDrawMoney(Guid accountNumber, decimal amount){
+            var account = accounts[accountNumber];
+            account.WithDrawMoney(amount);
         }
 
         public Status IsElligibleForLoan(Guid accountNumber, decimal loanAmount){
             var account = accounts[accountNumber];
-            var balance = account.Balance;
-            return (balance >= loanAmount / 2)
-            ? Status.Approved
-            : Status.Rejected;
+            return account.IsElligibleForLoan(loanAmount);
         }
 
         public string DisplayAccounts()
         {
             var builder = new StringBuilder();
-
             var accountNumbers = accounts.Keys;
             builder.AppendLine($"The bank has {accountNumbers.Count} accounts");
             foreach(var accountNumber in accountNumbers)
@@ -60,12 +70,16 @@ namespace DesignPatterns
             return builder.ToString();
         }
 
-        public void AddInterest(){
+        public void AddInterest()
+        {
             var accountNumbers = accounts.Keys;
             foreach(var accountNumber in accountNumbers)
             {
                 var account = accounts[accountNumber];
-                account.Balance *= (decimal) (1 + rate);
+                if (account is SavingsAccount) 
+                {
+                    ((SavingsAccount)account).AddInterest(rate);
+                }
             }
         }
 
@@ -74,13 +88,8 @@ namespace DesignPatterns
                                   decimal amount){
            var senderAccount = accounts[senderAccountNumber];
            var recipientAccount = accounts[recipientAccountNumber];
-           var currentBalance = senderAccount.Balance;
-
-           if(amount > currentBalance)
-               throw new Exception("The sender doesn't have sufficient balance");
-            
-           senderAccount.Balance -=  amount;
-           recipientAccount.Balance += amount;
+           senderAccount.WithDrawMoney(amount);
+           recipientAccount.DepositMoney(amount);
         }
     }
 }

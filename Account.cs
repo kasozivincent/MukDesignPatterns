@@ -3,29 +3,38 @@ using System.Data;
 
 namespace DesignPatterns
 {
-    public class Account
+    public abstract class Account
     {
-        private Account(){}
         public Guid AccountNumber { get; set; }
-        public decimal Balance {get; set;} 
+        public decimal Balance {get; protected set;} 
         public State State { get; set; }
         public Category Category {get; set; }
         public DateTime CreatedOn { get; set; }
 
-        public static Account Create(decimal balance, Category category)
+        protected  Account(decimal balance, Category category)
         {
-            return new Account {
-                AccountNumber = Guid.NewGuid(),
-                Category = category,
-                Balance = balance,
-                State = State.Active,
-                CreatedOn = DateTime.Now
-            };
+            Balance = balance;
+            Category = category;
+            State = State.Active;
+            CreatedOn = DateTime.Now;
         }
-        public override string ToString()
-        {
-            return $"Account Number: {AccountNumber} -- Balance: {Balance} -- Creation Date: {CreatedOn} -- State: {State}";
+
+        public decimal DepositMoney(decimal amount){
+            if(State != State.Active)
+                throw new Exception("Account is not active");
+            Balance += amount;
+            return Balance;
         }
+
+        public void WithDrawMoney(decimal amount){
+            if(amount > Balance)
+                throw new Exception("Insufficient Balance");
+            if(State != State.Active)
+                throw new Exception("Account is not active");
+            Balance -= amount;
+        }
+
+        public abstract Status IsElligibleForLoan(decimal loanAmount);
 
     }
 }
